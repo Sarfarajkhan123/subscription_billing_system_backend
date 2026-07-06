@@ -1,0 +1,9 @@
+package com.subscript.subscription_billing_system.repository;
+
+import com.subscript.subscription_billing_system.entity.PaymentMethod;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, Integer> {
+    List<PaymentMethod> findByCustomer_CustomerId(Integer customerId);
+}
