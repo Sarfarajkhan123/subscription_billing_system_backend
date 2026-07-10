@@ -1,24 +1,26 @@
 package com.subscript.subscription.main.config;
 
+import com.subscript.subscription.service.service.security.CustomUserDetailsService;
+import com.subscript.subscription.service.service.security.JwtAuthenticationFilter;
+
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import com.subscript.subscription.service.security.CustomUserDetailsService;
-import com.subscript.subscription.service.security.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
-import com.subscript.subscription.service.security.JwtAuthenticationFilter;
 
 @Configuration
+@EnableMethodSecurity // enables @PreAuthorize on controllers
 @RequiredArgsConstructor
 public class SecurityBeansConfig {
 
@@ -32,42 +34,73 @@ public class SecurityBeansConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
+            AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-
         provider.setUserDetailsService(customUserDetailsService);
-
         provider.setPasswordEncoder(passwordEncoder());
-
         return provider;
     }
 
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-    http
+        http
+                .csrf(AbstractHttpConfigurer::disable)
 
-            .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write(
+                                    "{\"error\":\"Unauthorized - JWT token is missing or invalid\"}");
+                        }))
 
-            .sessionManagement(session ->
-                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .authenticationProvider(authenticationProvider())
+                .authenticationProvider(authenticationProvider())
 
-            .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
 
-                    // temporary
-                    .anyRequest().permitAll())
+                        // Public APIs
+                        .requestMatchers(
+                                "/api/auth/register",
+                                "/api/auth/login")
+                        .permitAll()
 
-            .addFilterBefore(
-                    jwtAuthenticationFilter,
-                    UsernamePasswordAuthenticationFilter.class);
+                        // IT Admin
+                        .requestMatchers("/api/admin/**")
+                        .hasRole("IT_ADMIN")
 
-    return http.build();
+                        // Finance
+                        .requestMatchers("/api/payments/**")
+                        .hasRole("FINANCE")
+
+                        .requestMatchers("/api/invoices/**")
+                        .hasRole("FINANCE")
+
+                        // Product
+                        .requestMatchers("/api/services/**")
+                        .hasRole("PRODUCT")
+
+                        .requestMatchers("/api/plans/**")
+                        .hasRole("PRODUCT")
+
+                        // Support
+                        .requestMatchers("/api/support/**")
+                        .hasRole("SUPPORT")
+
+                        // All remaining endpoints
+                        .anyRequest().authenticated())
+
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
 }
