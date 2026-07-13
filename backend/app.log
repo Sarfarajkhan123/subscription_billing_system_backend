@@ -1,0 +1,133 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-07-10T17:19:05.804+05:30  INFO 48722 --- [subscription-billing-system] [           main] s.m.SubscriptionBillingSystemApplication : Starting SubscriptionBillingSystemApplication v1.0.0 using Java 21.0.11 with PID 48722 (/Users/apple/Downloads/subscription-billing-system/subscription-main/target/subscription-main-1.0.0.jar started by apple in /Users/apple/Downloads/subscription-billing-system)
+2026-07-10T17:19:05.805+05:30  INFO 48722 --- [subscription-billing-system] [           main] s.m.SubscriptionBillingSystemApplication : No active profile set, falling back to 1 default profile: "default"
+2026-07-10T17:19:06.035+05:30  INFO 48722 --- [subscription-billing-system] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-10T17:19:06.056+05:30  INFO 48722 --- [subscription-billing-system] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 19 ms. Found 14 JPA repository interfaces.
+2026-07-10T17:19:06.333+05:30  INFO 48722 --- [subscription-billing-system] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8083 (http)
+2026-07-10T17:19:06.338+05:30  INFO 48722 --- [subscription-billing-system] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-07-10T17:19:06.338+05:30  INFO 48722 --- [subscription-billing-system] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-07-10T17:19:06.349+05:30  INFO 48722 --- [subscription-billing-system] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-07-10T17:19:06.349+05:30  INFO 48722 --- [subscription-billing-system] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 525 ms
+2026-07-10T17:19:06.400+05:30  INFO 48722 --- [subscription-billing-system] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-10T17:19:06.418+05:30  INFO 48722 --- [subscription-billing-system] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.3.Final
+2026-07-10T17:19:06.428+05:30  INFO 48722 --- [subscription-billing-system] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-07-10T17:19:06.532+05:30  INFO 48722 --- [subscription-billing-system] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-10T17:19:06.545+05:30  INFO 48722 --- [subscription-billing-system] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-07-10T17:19:06.675+05:30  INFO 48722 --- [subscription-billing-system] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6df37f7a
+2026-07-10T17:19:06.676+05:30  INFO 48722 --- [subscription-billing-system] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-07-10T17:19:06.693+05:30  WARN 48722 --- [subscription-billing-system] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-10T17:19:06.693+05:30  WARN 48722 --- [subscription-billing-system] [           main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2026-07-10T17:19:07.070+05:30  INFO 48722 --- [subscription-billing-system] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    alter table customers 
+       modify column address TEXT
+Hibernate: 
+    alter table services 
+       modify column description TEXT
+Hibernate: 
+    alter table subscription_plans 
+       modify column features TEXT
+Hibernate: 
+    alter table support_tickets 
+       modify column description TEXT
+2026-07-10T17:19:07.196+05:30  INFO 48722 --- [subscription-billing-system] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-10T17:19:07.420+05:30  INFO 48722 --- [subscription-billing-system] [           main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-07-10T17:19:07.421+05:30  WARN 48722 --- [subscription-billing-system] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used for username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider.
+2026-07-10T17:19:07.446+05:30  WARN 48722 --- [subscription-billing-system] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-10T17:19:07.657+05:30  INFO 48722 --- [subscription-billing-system] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8083 (http) with context path '/'
+2026-07-10T17:19:07.665+05:30  INFO 48722 --- [subscription-billing-system] [           main] s.m.SubscriptionBillingSystemApplication : Started SubscriptionBillingSystemApplication in 1.989 seconds (process running for 2.178)
+2026-07-10T17:20:26.714+05:30  INFO 48722 --- [subscription-billing-system] [nio-8083-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-10T17:20:26.714+05:30  INFO 48722 --- [subscription-billing-system] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-07-10T17:20:26.715+05:30  INFO 48722 --- [subscription-billing-system] [nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-07-10T17:20:26.726+05:30  WARN 48722 --- [subscription-billing-system] [nio-8083-exec-1] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'GET' is not supported]
+Hibernate: 
+    select
+        u1_0.user_id 
+    from
+        users u1_0 
+    where
+        u1_0.email=? 
+    limit
+        ?
+Hibernate: 
+    insert 
+    into
+        users
+        (created_at, email, first_name, last_name, password_hash, phone, role, status) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        customers
+        (address, company_name, contact_person, created_at, email, phone, status, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        u1_0.user_id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.status 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.user_id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.status 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.user_id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.status 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.address,
+        c1_0.company_name,
+        c1_0.contact_person,
+        c1_0.created_at,
+        c1_0.email,
+        c1_0.phone,
+        c1_0.status,
+        c1_0.user_id 
+    from
+        customers c1_0
+2026-07-10T17:38:38.750+05:30  WARN 48722 --- [subscription-billing-system] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m1s931ms).

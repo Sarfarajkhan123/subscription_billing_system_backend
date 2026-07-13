@@ -1,0 +1,185 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.subscript:subscription-main:jar:1.0.0
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.springframework.boot:spring-boot-starter-security:jar -> duplicate declaration of version (?) @ line 55, column 17
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: io.jsonwebtoken:jjwt-api:jar -> version 0.12.3 vs 0.12.6 @ line 60, column 13
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: io.jsonwebtoken:jjwt-impl:jar -> version 0.12.3 vs 0.12.6 @ line 66, column 13
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: io.jsonwebtoken:jjwt-jackson:jar -> version 0.12.3 vs 0.12.6 @ line 73, column 13
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: io.jsonwebtoken:jjwt-api:jar -> version 0.12.3 vs 0.12.5 @ line 79, column 13
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: io.jsonwebtoken:jjwt-impl:jar -> version 0.12.3 vs 0.12.5 @ line 85, column 13
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: io.jsonwebtoken:jjwt-jackson:jar -> version 0.12.3 vs 0.12.5 @ line 92, column 13
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] subscription-billing-system                                        [pom]
+[INFO] subscription-api                                                   [jar]
+[INFO] subscription-service                                               [jar]
+[INFO] subscription-main                                                  [jar]
+[INFO] 
+[INFO] -------------< com.subscript:subscription-billing-system >--------------
+[INFO] Building subscription-billing-system 1.0.0                         [1/4]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ subscription-billing-system ---
+[INFO] 
+[INFO] --- install:3.1.3:install (default-install) @ subscription-billing-system ---
+[INFO] Installing /Users/apple/Downloads/subscription-billing-system/pom.xml to /Users/apple/.m2/repository/com/subscript/subscription-billing-system/1.0.0/subscription-billing-system-1.0.0.pom
+[INFO] 
+[INFO] -------------------< com.subscript:subscription-api >-------------------
+[INFO] Building subscription-api 1.0.0                                    [2/4]
+[INFO]   from subscription-api/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ subscription-api ---
+[INFO] Deleting /Users/apple/Downloads/subscription-billing-system/subscription-api/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ subscription-api ---
+[INFO] skip non existing resourceDirectory /Users/apple/Downloads/subscription-billing-system/subscription-api/src/main/resources
+[INFO] skip non existing resourceDirectory /Users/apple/Downloads/subscription-billing-system/subscription-api/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ subscription-api ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 50 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ subscription-api ---
+[INFO] skip non existing resourceDirectory /Users/apple/Downloads/subscription-billing-system/subscription-api/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ subscription-api ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ subscription-api ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ subscription-api ---
+[INFO] Building jar: /Users/apple/Downloads/subscription-billing-system/subscription-api/target/subscription-api-1.0.0.jar
+[INFO] 
+[INFO] --- install:3.1.3:install (default-install) @ subscription-api ---
+[INFO] Installing /Users/apple/Downloads/subscription-billing-system/subscription-api/pom.xml to /Users/apple/.m2/repository/com/subscript/subscription-api/1.0.0/subscription-api-1.0.0.pom
+[INFO] Installing /Users/apple/Downloads/subscription-billing-system/subscription-api/target/subscription-api-1.0.0.jar to /Users/apple/.m2/repository/com/subscript/subscription-api/1.0.0/subscription-api-1.0.0.jar
+[INFO] 
+[INFO] -----------------< com.subscript:subscription-service >-----------------
+[INFO] Building subscription-service 1.0.0                                [3/4]
+[INFO]   from subscription-service/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ subscription-service ---
+[INFO] Deleting /Users/apple/Downloads/subscription-billing-system/subscription-service/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ subscription-service ---
+[INFO] skip non existing resourceDirectory /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/resources
+[INFO] skip non existing resourceDirectory /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ subscription-service ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 58 source files with javac [debug parameters release 21] to target/classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/impl/UserServiceImpl.java:[3,52] package org.springframework.security.crypto.password does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/impl/UserServiceImpl.java:[18,19] cannot find symbol
+  symbol:   class PasswordEncoder
+  location: class com.subscript.subscription.service.service.impl.UserServiceImpl
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/impl/UserServiceImpl.java:[14,1] cannot find symbol
+  symbol:   class PasswordEncoder
+  location: class com.subscript.subscription.service.service.impl.UserServiceImpl
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/CustomUserDetailsService.java:[12,20] cannot find symbol
+  symbol: class UserDetailsService
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/CustomUserDetailsService.java:[17,12] cannot find symbol
+  symbol:   class UserDetails
+  location: class com.subscript.subscription.service.service.security.CustomUserDetailsService
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/CustomUserDetailsService.java:[18,20] cannot find symbol
+  symbol:   class UsernameNotFoundException
+  location: class com.subscript.subscription.service.service.security.CustomUserDetailsService
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/CustomUserDetailsService.java:[6,1] package org.springframework.security.core.userdetails does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtAuthenticationFilter.java:[10,51] package org.springframework.security.authentication does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtAuthenticationFilter.java:[11,49] package org.springframework.security.core.context does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtAuthenticationFilter.java:[12,53] package org.springframework.security.core.userdetails does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtAuthenticationFilter.java:[13,55] package org.springframework.security.web.authentication does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[4,23] package io.jsonwebtoken does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[5,23] package io.jsonwebtoken does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[6,32] package io.jsonwebtoken.security does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[8,53] package org.springframework.security.core.userdetails does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[58,47] cannot find symbol
+  symbol:   class UserDetails
+  location: class com.subscript.subscription.service.service.security.JwtService
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[79,13] cannot find symbol
+  symbol:   class Claims
+  location: class com.subscript.subscription.service.service.security.JwtService
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/UserPrincipal.java:[4,41] package org.springframework.security.core does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/UserPrincipal.java:[5,51] package org.springframework.security.core.authority does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/UserPrincipal.java:[6,53] package org.springframework.security.core.userdetails does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/UserPrincipal.java:[11,39] cannot find symbol
+  symbol: class UserDetails
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/UserPrincipal.java:[25,33] cannot find symbol
+  symbol:   class GrantedAuthority
+  location: class com.subscript.subscription.service.service.security.UserPrincipal
+[INFO] 22 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for subscription-billing-system 1.0.0:
+[INFO] 
+[INFO] subscription-billing-system ........................ SUCCESS [  0.073 s]
+[INFO] subscription-api ................................... SUCCESS [  1.377 s]
+[INFO] subscription-service ............................... FAILURE [  0.345 s]
+[INFO] subscription-main .................................. SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.923 s
+[INFO] Finished at: 2026-07-10T14:23:42+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project subscription-service: Compilation failure: Compilation failure: 
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/impl/UserServiceImpl.java:[3,52] package org.springframework.security.crypto.password does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/impl/UserServiceImpl.java:[18,19] cannot find symbol
+[ERROR]   symbol:   class PasswordEncoder
+[ERROR]   location: class com.subscript.subscription.service.service.impl.UserServiceImpl
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/impl/UserServiceImpl.java:[14,1] cannot find symbol
+[ERROR]   symbol:   class PasswordEncoder
+[ERROR]   location: class com.subscript.subscription.service.service.impl.UserServiceImpl
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/CustomUserDetailsService.java:[12,20] cannot find symbol
+[ERROR]   symbol: class UserDetailsService
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/CustomUserDetailsService.java:[17,12] cannot find symbol
+[ERROR]   symbol:   class UserDetails
+[ERROR]   location: class com.subscript.subscription.service.service.security.CustomUserDetailsService
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/CustomUserDetailsService.java:[18,20] cannot find symbol
+[ERROR]   symbol:   class UsernameNotFoundException
+[ERROR]   location: class com.subscript.subscription.service.service.security.CustomUserDetailsService
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/CustomUserDetailsService.java:[6,1] package org.springframework.security.core.userdetails does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtAuthenticationFilter.java:[10,51] package org.springframework.security.authentication does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtAuthenticationFilter.java:[11,49] package org.springframework.security.core.context does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtAuthenticationFilter.java:[12,53] package org.springframework.security.core.userdetails does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtAuthenticationFilter.java:[13,55] package org.springframework.security.web.authentication does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[4,23] package io.jsonwebtoken does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[5,23] package io.jsonwebtoken does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[6,32] package io.jsonwebtoken.security does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[8,53] package org.springframework.security.core.userdetails does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[58,47] cannot find symbol
+[ERROR]   symbol:   class UserDetails
+[ERROR]   location: class com.subscript.subscription.service.service.security.JwtService
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/JwtService.java:[79,13] cannot find symbol
+[ERROR]   symbol:   class Claims
+[ERROR]   location: class com.subscript.subscription.service.service.security.JwtService
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/UserPrincipal.java:[4,41] package org.springframework.security.core does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/UserPrincipal.java:[5,51] package org.springframework.security.core.authority does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/UserPrincipal.java:[6,53] package org.springframework.security.core.userdetails does not exist
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/UserPrincipal.java:[11,39] cannot find symbol
+[ERROR]   symbol: class UserDetails
+[ERROR] /Users/apple/Downloads/subscription-billing-system/subscription-service/src/main/java/com/subscript/subscription/service/service/security/UserPrincipal.java:[25,33] cannot find symbol
+[ERROR]   symbol:   class GrantedAuthority
+[ERROR]   location: class com.subscript.subscription.service.service.security.UserPrincipal
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :subscription-service
