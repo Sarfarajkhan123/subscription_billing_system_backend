@@ -6,6 +6,7 @@ import com.subscript.subscription.service.service.security.JwtAuthenticationFilt
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -18,7 +19,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import java.util.List;
 
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import org.springframework.security.config.Customizer;
 @Configuration
 @EnableMethodSecurity // enables @PreAuthorize on controllers
 @RequiredArgsConstructor
@@ -51,6 +58,7 @@ public class SecurityBeansConfig {
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
 
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -83,12 +91,13 @@ public class SecurityBeansConfig {
                         .requestMatchers("/api/invoices/**")
                         .hasRole("FINANCE")
 
-                        // Product
-                        .requestMatchers("/api/services/**")
-                        .hasRole("PRODUCT")
+                        // Product + IT Admin manage the catalog; any authenticated
+                        // user (incl. customers) may VIEW services & plans.
+                        .requestMatchers(HttpMethod.GET, "/api/services/**", "/api/plans/**")
+                        .authenticated()
 
-                        .requestMatchers("/api/plans/**")
-                        .hasRole("PRODUCT")
+                        .requestMatchers("/api/services/**", "/api/plans/**")
+                        .hasAnyRole("PRODUCT", "IT_ADMIN")
 
                         // Support
                         .requestMatchers("/api/support/**")
@@ -103,4 +112,27 @@ public class SecurityBeansConfig {
 
         return http.build();
     }
+    @Bean
+public CorsConfigurationSource corsConfigurationSource() {
+
+    CorsConfiguration configuration = new CorsConfiguration();
+
+    configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+    configuration.setAllowedMethods(List.of(
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "OPTIONS"));
+
+    configuration.setAllowedHeaders(List.of("*"));
+    configuration.setAllowCredentials(true);
+
+    UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+
+    source.registerCorsConfiguration("/**", configuration);
+
+    return source;
+}
 }
