@@ -80,6 +80,12 @@ public class SecurityBeansConfig {
                                 "/api/auth/login")
                         .permitAll()
 
+                        // Error dispatch must be reachable so real HTTP status codes
+                        // (400/403/500) surface instead of being masked as 401 by the
+                        // authenticationEntryPoint on the anonymous /error forward.
+                        .requestMatchers("/error")
+                        .permitAll()
+
                         // IT Admin
                         .requestMatchers("/api/admin/**")
                         .hasRole("IT_ADMIN")
@@ -88,8 +94,20 @@ public class SecurityBeansConfig {
                         .requestMatchers("/api/payments/**")
                         .hasRole("FINANCE")
 
+                        // Customers may read only their OWN invoices (ownership
+                        // enforced in the controller): the customer list and the
+                        // single-invoice detail. Everything else (list-all, by-status,
+                        // mark-paid/overdue, generate, delete) is Finance / IT Admin.
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/invoices/customer/**", "/api/invoices/*")
+                        .hasAnyRole("CUSTOMER", "FINANCE", "IT_ADMIN")
+
                         .requestMatchers("/api/invoices/**")
-                        .hasRole("FINANCE")
+                        .hasAnyRole("FINANCE", "IT_ADMIN")
+
+                        // Dashboard overview metrics — Finance / IT Admin only.
+                        .requestMatchers("/api/dashboard/**")
+                        .hasAnyRole("FINANCE", "IT_ADMIN")
 
                         // Product + IT Admin manage the catalog; any authenticated
                         // user (incl. customers) may VIEW services & plans.
