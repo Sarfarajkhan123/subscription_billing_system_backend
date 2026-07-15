@@ -9,4 +9,6 @@ public interface UsageDataRepository extends JpaRepository<UsageData, Integer> {
     List<UsageData> findBySubscription_SubscriptionId(Integer subscriptionId);
 
     Optional<UsageData> findTopBySubscription_SubscriptionIdOrderByRecordedAtDesc(Integer subscriptionId);
+
+    void deleteBySubscription_SubscriptionId(Integer subscriptionId);
 }

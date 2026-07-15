@@ -9,7 +9,8 @@ public interface SubscriptionController {
 
         ResponseEntity<SubscriptionResponse> subscribe(
                         Integer customerId,
-                        Integer planId);
+                        Integer planId,
+                        String couponCode);
 
         ResponseEntity<List<SubscriptionResponse>> getAllSubscriptions();
 

@@ -37,4 +37,9 @@ public class SubscriptionResponse {
     private LocalDate renewalDate;
 
     private String apiKey;
+
+    // Billing summary for the subscribe response (final amount after coupon).
+    private BigDecimal discountAmount;
+
+    private BigDecimal finalAmount;
 }

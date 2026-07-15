@@ -2,6 +2,7 @@ package com.subscript.subscription.api.controller;
 
 import com.subscript.subscription.api.wrapper.request.UsageDataRequest;
 import com.subscript.subscription.api.wrapper.response.UsageDataResponse;
+import com.subscript.subscription.api.wrapper.response.UsageSummaryResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -16,6 +17,10 @@ public interface UsageDataController {
         ResponseEntity<List<UsageDataResponse>> getBySubscription(
                         Integer subscriptionId);
 
+        // Meter-based usage summary (limit / remaining / % / overage)
+        ResponseEntity<UsageSummaryResponse> getUsageSummary(
+                        Integer subscriptionId);
+
         // Get latest usage record
         ResponseEntity<UsageDataResponse> getLatest(
                         Integer subscriptionId);
@@ -27,4 +32,8 @@ public interface UsageDataController {
         // Delete usage record
         ResponseEntity<String> deleteUsage(
                         Integer id);
+
+        // Reset (clear) all usage for a subscription
+        ResponseEntity<String> deleteBySubscription(
+                        Integer subscriptionId);
 }

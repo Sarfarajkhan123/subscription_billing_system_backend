@@ -3,11 +3,14 @@ package com.subscript.subscription.service.service.impl;
 import com.subscript.subscription.api.model.*;
 import com.subscript.subscription.service.repository.*;
 import com.subscript.subscription.service.service.interfaces.AuditLogService;
+import com.subscript.subscription.service.service.interfaces.DiscountService;
 import com.subscript.subscription.service.service.interfaces.SubscriptionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import com.subscript.subscription.api.wrapper.mapper.SubscriptionMapper;
 import com.subscript.subscription.api.wrapper.response.SubscriptionResponse;
 import java.math.BigDecimal;
@@ -29,19 +32,31 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final PlanMeterMappingRepository planMeterMappingRepository;
     private final PaymentMethodRepository paymentMethodRepository;
     private final AuditLogService auditLogService;
+    private final DiscountService discountService;
 
     // SUBSCRIBE — if plan has trial_days > 0 → trial; else → active + invoice
     @Override
     @Transactional
     public SubscriptionResponse subscribe(
             Integer customerId,
-            Integer planId) {
+            Integer planId,
+            String couponCode) {
 
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Customer not found: " + customerId));
 
         SubscriptionPlan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new RuntimeException("Plan not found: " + planId));
+
+        // Optional coupon: reuse the existing validation; invalid/expired => HTTP 400.
+        Discount discount = null;
+        if (couponCode != null && !couponCode.isBlank()) {
+            try {
+                discount = discountService.validateCoupon(couponCode.trim());
+            } catch (RuntimeException ex) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+            }
+        }
 
         subscriptionRepository
                 .findByCustomer_CustomerIdAndPlan_PlanIdAndStatusIn(
@@ -69,6 +84,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         subscription.setStartDate(LocalDate.now());
 
+        BigDecimal basePrice = plan.getBasePrice() != null ? plan.getBasePrice() : BigDecimal.ZERO;
+        BigDecimal finalAmount;
+
         Integer trialDays = plan.getTrialDays();
 
         if (trialDays != null && trialDays > 0) {
@@ -79,6 +97,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                     LocalDate.now().plusDays(trialDays));
 
             subscription = subscriptionRepository.save(subscription);
+
+            // Trial has no invoice yet; a coupon (if supplied) is validated above
+            // but only applied when the trial converts and an invoice is created.
+            finalAmount = basePrice;
 
             auditLogService.log(
                     customer.getUser().getUserId(),
@@ -97,7 +119,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
             subscription = subscriptionRepository.save(subscription);
 
-            generateInvoice(subscription, plan);
+            finalAmount = generateInvoice(subscription, plan, discount);
+
+            if (discount != null) {
+                // Count the redemption so max_uses stays enforceable. The Discount
+                // is managed within this @Transactional, so the update is flushed.
+                discount.setCurrentUses(
+                        (discount.getCurrentUses() == null ? 0 : discount.getCurrentUses()) + 1);
+            }
 
             auditLogService.log(
                     customer.getUser().getUserId(),
@@ -107,7 +136,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                     "Subscription created successfully.");
         }
 
-        return SubscriptionMapper.toResponse(subscription);
+        SubscriptionResponse response = SubscriptionMapper.toResponse(subscription);
+        response.setDiscountAmount(basePrice.subtract(finalAmount));
+        response.setFinalAmount(finalAmount);
+        return response;
     }
 
     @Override
@@ -214,7 +246,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             sub.setStatus(Subscription.Status.active);
             sub.setRenewalDate(LocalDate.now().plusMonths(1));
             subscriptionRepository.save(sub);
-            generateInvoice(sub, sub.getPlan());
+            generateInvoice(sub, sub.getPlan(), null);
             auditLogService.log(
                     sub.getCustomer().getUser().getUserId(),
                     "TRIAL_CONVERTED_ACTIVE",
@@ -295,19 +327,45 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     // ── private helpers ──────────────────────────────────────────────────────
 
-    private void generateInvoice(Subscription sub, SubscriptionPlan plan) {
+    /**
+     * Generates the pending invoice for a subscription. When a validated
+     * {@code discount} is supplied it is applied to the existing invoice columns
+     * (base / discount / tax / total); with no discount the amounts are identical
+     * to the previous behaviour. Returns the final total charged.
+     */
+    private BigDecimal generateInvoice(Subscription sub, SubscriptionPlan plan, Discount discount) {
+        BigDecimal base = plan.getBasePrice() != null ? plan.getBasePrice() : BigDecimal.ZERO;
+
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        if (discount != null) {
+            if (discount.getDiscountType() == Discount.DiscountType.percentage) {
+                discountAmount = base
+                        .multiply(discount.getDiscountValue())
+                        .divide(BigDecimal.valueOf(100));
+            } else { // fixed_amount
+                discountAmount = discount.getDiscountValue();
+            }
+            if (discountAmount.compareTo(base) > 0) {
+                discountAmount = base; // never charge below zero
+            }
+        }
+
+        BigDecimal total = base.subtract(discountAmount);
+
         Invoice invoice = new Invoice();
         invoice.setCustomer(sub.getCustomer());
         invoice.setSubscription(sub);
         invoice.setInvoiceNumber("INV-" + System.currentTimeMillis());
-        invoice.setBaseAmount(plan.getBasePrice() != null ? plan.getBasePrice() : BigDecimal.ZERO);
-        invoice.setDiscountAmount(BigDecimal.ZERO);
+        invoice.setBaseAmount(base);
+        invoice.setDiscountAmount(discountAmount);
         invoice.setTaxAmount(BigDecimal.ZERO);
-        invoice.setTotalAmount(plan.getBasePrice() != null ? plan.getBasePrice() : BigDecimal.ZERO);
+        invoice.setTotalAmount(total);
         invoice.setPeriodStart(LocalDate.now());
         invoice.setPeriodEnd(LocalDate.now().plusMonths(1));
         invoice.setDueDate(LocalDate.now().plusDays(15));
         invoice.setStatus(Invoice.Status.pending);
         invoiceRepository.save(invoice);
+
+        return total;
     }
 }

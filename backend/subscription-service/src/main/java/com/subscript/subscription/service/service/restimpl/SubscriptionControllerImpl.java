@@ -2,13 +2,17 @@ package com.subscript.subscription.service.service.restimpl;
 
 import com.subscript.subscription.api.controller.SubscriptionController;
 import com.subscript.subscription.api.wrapper.response.SubscriptionResponse;
+import com.subscript.subscription.service.service.interfaces.CustomerService;
 import com.subscript.subscription.service.service.interfaces.SubscriptionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/subscriptions")
@@ -17,14 +21,18 @@ import java.util.Map;
 public class SubscriptionControllerImpl implements SubscriptionController {
 
         private final SubscriptionService subscriptionService;
+        private final CustomerService customerService;
 
-        // POST /api/subscriptions?customerId=1&planId=2
+        // POST /api/subscriptions?customerId=1&planId=2&couponCode=SAVE20
         @Override
         @PostMapping
         public ResponseEntity<SubscriptionResponse> subscribe(
                         @RequestParam Integer customerId,
-                        @RequestParam Integer planId) {
-                return ResponseEntity.ok(subscriptionService.subscribe(customerId, planId));
+                        @RequestParam Integer planId,
+                        @RequestParam(required = false) String couponCode) {
+                enforceOwnership(customerId);
+                return ResponseEntity.ok(
+                                subscriptionService.subscribe(customerId, planId, couponCode));
         }
 
         // GET /api/subscriptions
@@ -39,6 +47,7 @@ public class SubscriptionControllerImpl implements SubscriptionController {
         @GetMapping("/customer/{customerId}")
         public ResponseEntity<List<SubscriptionResponse>> getByCustomer(
                         @PathVariable Integer customerId) {
+                enforceOwnership(customerId);
                 return ResponseEntity.ok(subscriptionService.getSubscriptionsByCustomer(customerId));
         }
 
@@ -85,5 +94,40 @@ public class SubscriptionControllerImpl implements SubscriptionController {
         @GetMapping("/{id}/trial-status")
         public ResponseEntity<?> getTrialStatus(@PathVariable Integer id) {
                 return ResponseEntity.ok(subscriptionService.getTrialStatus(id));
+        }
+
+        /**
+         * Ownership guard: a CUSTOMER may only create/view their OWN subscriptions.
+         * Support and IT Admin are privileged and keep full access (unchanged), so
+         * there is no regression for those roles. Identity comes from the JWT via
+         * the Spring Security context; the caller-supplied customerId is validated
+         * against the authenticated user's own customerId.
+         */
+        private void enforceOwnership(Integer customerId) {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+                boolean privileged = auth.getAuthorities().stream()
+                                .anyMatch(a -> a.getAuthority().equals("ROLE_IT_ADMIN")
+                                                || a.getAuthority().equals("ROLE_SUPPORT"));
+                if (privileged) {
+                        return;
+                }
+
+                Integer ownCustomerId;
+                try {
+                        ownCustomerId = customerService.getMyProfile(auth.getName())
+                                        .getCustomerId();
+                } catch (RuntimeException ex) {
+                        // Caller has no customer profile (e.g. product/finance employee)
+                        // — it is simply not their resource. Return 403, not 500.
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "You can only access your own subscriptions.");
+                }
+                if (!ownCustomerId.equals(customerId)) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "You can only access your own subscriptions.");
+                }
         }
 }

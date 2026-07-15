@@ -8,7 +8,8 @@ public interface SubscriptionService {
 
     SubscriptionResponse subscribe(
             Integer customerId,
-            Integer planId);
+            Integer planId,
+            String couponCode);
 
     List<SubscriptionResponse> getAllSubscriptions();
 
