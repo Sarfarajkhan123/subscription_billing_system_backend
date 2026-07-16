@@ -64,6 +64,15 @@ public class DiscountControllerImpl implements DiscountController {
         return ResponseEntity.ok(discountService.updateDiscount(id, updated));
     }
 
+    // PUT /api/discounts/{id}/activate
+    @Override
+    @PutMapping("/{id}/activate")
+    public ResponseEntity<Discount> activateDiscount(
+            @PathVariable Integer id) {
+
+        return ResponseEntity.ok(discountService.activateDiscount(id));
+    }
+
     // PUT /api/discounts/{id}/deactivate
     @Override
     @PutMapping("/{id}/deactivate")

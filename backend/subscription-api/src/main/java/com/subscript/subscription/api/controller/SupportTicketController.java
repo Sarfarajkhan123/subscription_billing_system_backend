@@ -1,42 +1,22 @@
 package com.subscript.subscription.api.controller;
 
-import com.subscript.subscription.api.model.SupportTicket;
+import com.subscript.subscription.api.wrapper.request.SupportTicketRequest;
+import com.subscript.subscription.api.wrapper.request.TicketStatusUpdateRequest;
+import com.subscript.subscription.api.wrapper.response.SupportTicketResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface SupportTicketController {
 
-        ResponseEntity<SupportTicket> createTicket(
-                        Integer customerId,
-                        SupportTicket ticket);
+    ResponseEntity<SupportTicketResponse> createTicket(SupportTicketRequest request);
 
-        ResponseEntity<List<SupportTicket>> getAllTickets();
+    ResponseEntity<List<SupportTicketResponse>> getAllTickets();
 
-        ResponseEntity<List<SupportTicket>> getByCustomer(
-                        Integer customerId);
+    ResponseEntity<List<SupportTicketResponse>> getMyTickets();
 
-        ResponseEntity<List<SupportTicket>> getByStatus(
-                        String status);
+    ResponseEntity<SupportTicketResponse> getTicketById(Integer id);
 
-        ResponseEntity<SupportTicket> getById(
-                        Integer id);
-
-        ResponseEntity<SupportTicket> assignTicket(
-                        Integer id,
-                        Integer agentId);
-
-        ResponseEntity<SupportTicket> resolveTicket(
-                        Integer id);
-
-        ResponseEntity<SupportTicket> closeTicket(
-                        Integer id);
-
-        ResponseEntity<SupportTicket> updateTicket(
-                        Integer id,
-                        SupportTicket updated);
-
-        ResponseEntity<String> deleteTicket(
-                        Integer id);
-
+    ResponseEntity<SupportTicketResponse> updateStatus(
+            Integer id, TicketStatusUpdateRequest request);
 }

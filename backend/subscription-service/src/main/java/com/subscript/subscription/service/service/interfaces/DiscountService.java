@@ -13,6 +13,7 @@ public interface DiscountService {
     Discount getDiscountById(Integer id);
     Discount validateCoupon(String couponCode);
     Discount updateDiscount(Integer id, Discount updated);
+    Discount activateDiscount(Integer id);
     Discount deactivateDiscount(Integer id);
     void deleteDiscount(Integer id);
 }

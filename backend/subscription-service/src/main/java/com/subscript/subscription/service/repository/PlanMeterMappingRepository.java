@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface PlanMeterMappingRepository extends JpaRepository<PlanMeterMapping, Integer> {
     List<PlanMeterMapping> findByPlan_PlanId(Integer planId);
+    List<PlanMeterMapping> findByMeter_MeterId(Integer meterId);
+    java.util.Optional<PlanMeterMapping> findFirstByPlan_PlanId(Integer planId);
 }

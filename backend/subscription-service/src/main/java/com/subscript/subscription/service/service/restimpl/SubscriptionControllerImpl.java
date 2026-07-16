@@ -56,7 +56,9 @@ public class SubscriptionControllerImpl implements SubscriptionController {
         @GetMapping("/{id}")
         public ResponseEntity<SubscriptionResponse> getById(
                         @PathVariable Integer id) {
-                return ResponseEntity.ok(subscriptionService.getSubscriptionById(id));
+                SubscriptionResponse sub = subscriptionService.getSubscriptionById(id);
+                enforceOwnership(sub.getCustomerId());
+                return ResponseEntity.ok(sub);
         }
 
         // PUT /api/subscriptions/{id}/upgrade?newPlanId=3
@@ -73,6 +75,9 @@ public class SubscriptionControllerImpl implements SubscriptionController {
         @PutMapping("/{id}/cancel")
         public ResponseEntity<SubscriptionResponse> cancelSubscription(
                         @PathVariable Integer id) {
+                // A customer may cancel only their OWN subscription; IT Admin any.
+                SubscriptionResponse sub = subscriptionService.getSubscriptionById(id);
+                enforceOwnership(sub.getCustomerId());
                 return ResponseEntity.ok(subscriptionService.cancelSubscription(id));
         }
 
@@ -93,22 +98,27 @@ public class SubscriptionControllerImpl implements SubscriptionController {
         @Override
         @GetMapping("/{id}/trial-status")
         public ResponseEntity<?> getTrialStatus(@PathVariable Integer id) {
+                SubscriptionResponse sub = subscriptionService.getSubscriptionById(id);
+                enforceOwnership(sub.getCustomerId());
                 return ResponseEntity.ok(subscriptionService.getTrialStatus(id));
         }
 
         /**
-         * Ownership guard: a CUSTOMER may only create/view their OWN subscriptions.
-         * Support and IT Admin are privileged and keep full access (unchanged), so
-         * there is no regression for those roles. Identity comes from the JWT via
-         * the Spring Security context; the caller-supplied customerId is validated
-         * against the authenticated user's own customerId.
+         * Ownership guard: a CUSTOMER may only act on their OWN subscriptions.
+         * Staff roles (Finance / Support / Product / IT Admin) bypass the
+         * ownership check — the coarse per-endpoint capability (view-only for
+         * Finance/Support/Product, full for IT Admin) is enforced by the
+         * SecurityBeansConfig matchers. Identity comes from the JWT; the
+         * customerId is validated against the authenticated user's own id.
          */
         private void enforceOwnership(Integer customerId) {
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
                 boolean privileged = auth.getAuthorities().stream()
                                 .anyMatch(a -> a.getAuthority().equals("ROLE_IT_ADMIN")
-                                                || a.getAuthority().equals("ROLE_SUPPORT"));
+                                                || a.getAuthority().equals("ROLE_FINANCE")
+                                                || a.getAuthority().equals("ROLE_SUPPORT")
+                                                || a.getAuthority().equals("ROLE_PRODUCT"));
                 if (privileged) {
                         return;
                 }

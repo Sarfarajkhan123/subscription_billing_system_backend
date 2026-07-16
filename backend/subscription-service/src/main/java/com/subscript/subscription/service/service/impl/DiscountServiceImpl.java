@@ -59,6 +59,12 @@ public class DiscountServiceImpl implements DiscountService {
         return discountRepository.save(existing);
     }
 
+    public Discount activateDiscount(Integer id) {
+        Discount discount = getDiscountById(id);
+        discount.setIsActive(true);
+        return discountRepository.save(discount);
+    }
+
     public Discount deactivateDiscount(Integer id) {
         Discount discount = getDiscountById(id);
         discount.setIsActive(false);

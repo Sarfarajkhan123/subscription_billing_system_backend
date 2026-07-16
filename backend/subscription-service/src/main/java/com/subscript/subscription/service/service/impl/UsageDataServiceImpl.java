@@ -87,20 +87,6 @@ public class UsageDataServiceImpl implements UsageDataService {
             }
         }
 
-        BigDecimal overageCharge = BigDecimal.ZERO;
-
-        if (sub.getStatus() != Subscription.Status.trial) {
-
-            Integer usageLimit = sub.getPlan().getUsageLimit();
-
-            if (usageLimit != null
-                    && apiCalls != null
-                    && apiCalls > usageLimit) {
-
-                int overage = apiCalls - usageLimit;
-                overageCharge = BigDecimal.valueOf(overage * 0.05);
-            }
-        }
 
         UsageData usage = new UsageData();
 
@@ -122,7 +108,7 @@ public class UsageDataServiceImpl implements UsageDataService {
                         ? BigDecimal.ZERO
                         : storageGb);
 
-        usage.setOverageCharge(overageCharge);
+        usage.setOverageCharge(BigDecimal.ZERO);
 
         UsageData saved = usageDataRepository.save(usage);
 
@@ -130,10 +116,13 @@ public class UsageDataServiceImpl implements UsageDataService {
             subscriptionService.checkTrialStatus(subscriptionId);
         }
 
+        UsageSummaryResponse summary = getUsageSummary(subscriptionId);
+
         // Usage-based billing: when this record exceeds the plan's included units,
         // bill the overage by REUSING the existing invoice generation (which adds
         // the latest usage's overageCharge to base + tax). No new billing logic.
-        if (overageCharge.compareTo(BigDecimal.ZERO) > 0) {
+        if (sub.getStatus() != Subscription.Status.trial &&
+            summary.getOverage() != null && summary.getOverage().compareTo(BigDecimal.ZERO) > 0) {
             InvoiceGenerateRequest invoiceRequest = new InvoiceGenerateRequest();
             invoiceRequest.setSubscriptionId(subscriptionId);
             invoiceService.generateInvoice(invoiceRequest);

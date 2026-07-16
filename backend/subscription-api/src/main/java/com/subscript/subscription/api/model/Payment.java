@@ -34,6 +34,11 @@ public class Payment {
     @Column(name = "transaction_id", unique = true, length = 100)
     private String transactionId;
 
+    // Razorpay order id created at checkout-start; correlates the order with the
+    // pending Payment row so the verify step can finalize it.
+    @Column(name = "razorpay_order_id", length = 100)
+    private String razorpayOrderId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private Status status = Status.pending;

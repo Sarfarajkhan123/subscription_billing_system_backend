@@ -17,6 +17,8 @@ public interface DiscountController {
 
     ResponseEntity<Discount> updateDiscount(Integer id, Discount updated);
 
+    ResponseEntity<Discount> activateDiscount(Integer id);
+
     ResponseEntity<Discount> deactivateDiscount(Integer id);
 
     ResponseEntity<String> deleteDiscount(Integer id);

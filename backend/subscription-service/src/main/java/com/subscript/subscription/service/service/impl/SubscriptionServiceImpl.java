@@ -350,7 +350,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             }
         }
 
-        BigDecimal total = base.subtract(discountAmount);
+        // Tax is calculated AFTER the discount, using the same rule as
+        // InvoiceServiceImpl.generateInvoice so checkout and invoice generation
+        // stay consistent for the same subscription + coupon.
+        BigDecimal netBase = base.subtract(discountAmount);
+        BigDecimal tax = netBase.multiply(BigDecimal.valueOf(0.18));
+        BigDecimal total = netBase.add(tax);
 
         Invoice invoice = new Invoice();
         invoice.setCustomer(sub.getCustomer());
@@ -358,14 +363,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         invoice.setInvoiceNumber("INV-" + System.currentTimeMillis());
         invoice.setBaseAmount(base);
         invoice.setDiscountAmount(discountAmount);
-        invoice.setTaxAmount(BigDecimal.ZERO);
+        invoice.setTaxAmount(tax);
         invoice.setTotalAmount(total);
         invoice.setPeriodStart(LocalDate.now());
         invoice.setPeriodEnd(LocalDate.now().plusMonths(1));
         invoice.setDueDate(LocalDate.now().plusDays(15));
         invoice.setStatus(Invoice.Status.pending);
+        // Persist the applied coupon so recurring cycle invoices keep applying it.
+        invoice.setDiscount(discount);
         invoiceRepository.save(invoice);
 
-        return total;
+        // Return the discounted price (pre-tax) so the subscribe response's
+        // discountAmount / finalAmount semantics are unchanged.
+        return netBase;
     }
 }

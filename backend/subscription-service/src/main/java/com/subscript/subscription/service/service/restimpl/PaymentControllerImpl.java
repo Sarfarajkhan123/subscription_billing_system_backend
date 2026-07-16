@@ -1,15 +1,22 @@
 package com.subscript.subscription.service.service.restimpl;
 
 import com.subscript.subscription.api.controller.PaymentController;
+import com.subscript.subscription.api.wrapper.request.PaymentOrderRequest;
 import com.subscript.subscription.api.wrapper.request.PaymentRequest;
+import com.subscript.subscription.api.wrapper.request.PaymentVerifyRequest;
+import com.subscript.subscription.api.wrapper.response.PaymentOrderResponse;
 import com.subscript.subscription.api.wrapper.response.PaymentResponse;
+import com.subscript.subscription.service.service.interfaces.CustomerService;
 import com.subscript.subscription.service.service.interfaces.PaymentService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -20,6 +27,7 @@ import java.util.List;
 public class PaymentControllerImpl implements PaymentController {
 
     private final PaymentService paymentService;
+    private final CustomerService customerService;
 
     // POST /api/payments/process
     @Override
@@ -27,6 +35,25 @@ public class PaymentControllerImpl implements PaymentController {
     public ResponseEntity<PaymentResponse> processPayment(
             @RequestBody PaymentRequest request) {
         return ResponseEntity.ok(paymentService.processPayment(request));
+    }
+
+    // POST /api/payments/order — start Razorpay checkout for the caller's invoice.
+    @Override
+    @PostMapping("/order")
+    public ResponseEntity<PaymentOrderResponse> createOrder(
+            @RequestBody PaymentOrderRequest request) {
+        Integer customerId = currentCustomerId();
+        return ResponseEntity.ok(
+                paymentService.createRazorpayOrder(request.getInvoiceId(), customerId));
+    }
+
+    // POST /api/payments/verify — verify Razorpay signature and finalize.
+    @Override
+    @PostMapping("/verify")
+    public ResponseEntity<PaymentResponse> verifyPayment(
+            @RequestBody PaymentVerifyRequest request) {
+        return ResponseEntity.ok(
+                paymentService.verifyRazorpayPayment(request));
     }
 
     // GET /api/payments
@@ -43,6 +70,8 @@ public class PaymentControllerImpl implements PaymentController {
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<List<PaymentResponse>> getByCustomer(
             @PathVariable Integer customerId) {
+
+        enforceOwnership(customerId);
 
         return ResponseEntity.ok(
                 paymentService.getPaymentsByCustomer(customerId));
@@ -79,5 +108,39 @@ public class PaymentControllerImpl implements PaymentController {
         return ResponseEntity.ok("Payment deleted successfully.");
     }
 
+    /** Resolve the signed-in customer's id from the JWT (for own-invoice payment). */
+    private Integer currentCustomerId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            return customerService.getMyProfile(auth.getName()).getCustomerId();
+        } catch (RuntimeException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "Only customers can start a payment.");
+        }
+    }
 
+    /**
+     * A CUSTOMER may only read their OWN payment history; Finance / IT Admin are
+     * privileged and unrestricted. Identity comes from the JWT.
+     */
+    private void enforceOwnership(Integer customerId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean privileged = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_FINANCE")
+                        || a.getAuthority().equals("ROLE_IT_ADMIN"));
+        if (privileged) {
+            return;
+        }
+        Integer ownId;
+        try {
+            ownId = customerService.getMyProfile(auth.getName()).getCustomerId();
+        } catch (RuntimeException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "You can only access your own payments.");
+        }
+        if (!ownId.equals(customerId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "You can only access your own payments.");
+        }
+    }
 }

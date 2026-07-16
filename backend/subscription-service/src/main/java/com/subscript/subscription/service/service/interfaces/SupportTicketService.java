@@ -1,25 +1,23 @@
 package com.subscript.subscription.service.service.interfaces;
 
-import com.subscript.subscription.api.model.Customer;
-import com.subscript.subscription.api.model.SupportTicket;
-import com.subscript.subscription.api.model.User;
-import com.subscript.subscription.service.repository.CustomerRepository;
-import com.subscript.subscription.service.repository.SupportTicketRepository;
-import com.subscript.subscription.service.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+import com.subscript.subscription.api.wrapper.request.SupportTicketRequest;
+import com.subscript.subscription.api.wrapper.response.SupportTicketResponse;
+
 import java.util.List;
 
 public interface SupportTicketService {
-    SupportTicket createTicket(Integer customerId, SupportTicket ticket);
-    List<SupportTicket> getAllTickets();
-    List<SupportTicket> getTicketsByCustomer(Integer customerId);
-    List<SupportTicket> getTicketsByStatus(String status);
-    SupportTicket getTicketById(Integer id);
-    SupportTicket assignTicket(Integer ticketId, Integer agentUserId);
-    SupportTicket resolveTicket(Integer id);
-    SupportTicket closeTicket(Integer id);
-    SupportTicket updateTicket(Integer id, SupportTicket updated);
-    void deleteTicket(Integer id);
+
+    // Customer opens a ticket for themselves.
+    SupportTicketResponse createTicket(Integer customerId, SupportTicketRequest request);
+
+    // Support / IT Admin: all tickets.
+    List<SupportTicketResponse> getAllTickets();
+
+    // A customer's own tickets.
+    List<SupportTicketResponse> getTicketsByCustomer(Integer customerId);
+
+    SupportTicketResponse getTicketById(Integer id);
+
+    // Support / IT Admin update the ticket status.
+    SupportTicketResponse updateStatus(Integer id, String status);
 }

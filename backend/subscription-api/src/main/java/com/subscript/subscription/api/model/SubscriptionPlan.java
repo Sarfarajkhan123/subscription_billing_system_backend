@@ -55,6 +55,18 @@ public class SubscriptionPlan {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    // ── Transient meter-provisioning fields ────────────────────────────────
+    // These are NOT persisted on subscription_plans; they are read once during
+    // createPlan / updatePlan to auto-create / update the PlanMeterMapping row.
+    @Transient
+    private Integer freeUnits;
+
+    @Transient
+    private Integer maxLimit;
+
+    @Transient
+    private BigDecimal pricePerUnit;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

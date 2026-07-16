@@ -15,6 +15,10 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Inte
 
     List<Subscription> findByStatus(Subscription.Status status);
 
+    // Active subscriptions whose renewal date has arrived — billing-cycle job.
+    List<Subscription> findByStatusAndRenewalDateLessThanEqual(
+            Subscription.Status status, LocalDate date);
+
     Optional<Subscription> findByCustomer_CustomerIdAndPlan_PlanIdAndStatusIn(
             Integer customerId,
             Integer planId,
